@@ -94,7 +94,8 @@ const NewRequest: React.FC = () => {
           </p>
           <div className="mx-auto w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-green-500"
+              className="h-full"
+              style={{ backgroundColor: '#0F767D' }}
               initial={{ width: 0 }}
               animate={{ width: '100%' }}
               transition={{ duration: 2 }}

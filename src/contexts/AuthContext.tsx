@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import logo from '../assets/logologin.png'; 
+import { motion } from 'framer-motion';
 
 type User = {
   id: string;
@@ -72,6 +73,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(user));
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      // Simula carregamento de 5 segundos
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -124,13 +129,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     delete axios.defaults.headers.common['Authorization'];
   };
 
-  // Mostra a logo com carregando
+  // Mostra a logo com barra carregando
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
         <div className="text-center">
-          <img src={logo} alt="Logo" className="h-20 mx-auto mb-4" />
-          <p className="text-gray-600">Carregando...</p>
+          <img src={logo} alt="Logo" className="h-48 mx-auto mb-6" />
+          <div className="mx-auto w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full"
+              style={{ backgroundColor: '#0F767D' }}
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 2, repeat: Infinity, repeatType: 'loop' }}
+            />
+          </div>
         </div>
       </div>
     );
