@@ -1,51 +1,39 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/Button';
 import { motion } from 'framer-motion';
-import { Plus, FileText, Calendar, Filter, ChevronDown, Search, Trash2, Eye } from 'lucide-react';
-
-// Mock data requests
-const mockRequests = [
-  {
-    id: 1,
-    academicInstitution: 'Universidade Federal',
-    campus: 'Campus Central',
-    specialty: 'Cardiologia',
-    requestType: 'Acompanhamento em casos Clínicos',
-    reason: 'Necessito acesso ao sistema para acompanhamento de atividades acadêmicas.',
-    status: 'pending',
-    date: '2023-08-15',
-  },
-  {
-    id: 2,
-    academicInstitution: 'Universidade Federal',
-    campus: 'Campus Central',
-    specialty: 'Pediatria',
-    requestType: 'Participação em Grupo',
-    reason: 'Solicito participação no grupo de pesquisa em pediatria.',
-    status: 'approved',
-    date: '2023-08-10',
-  },
-  {
-    id: 3,
-    academicInstitution: 'Universidade Federal',
-    campus: 'Campus Central',
-    specialty: 'Neurologia',
-    requestType: 'Auxiliar em Procedimento',
-    reason: 'Preciso de suporte para acesso às ferramentas de pesquisa.',
-    status: 'pending',
-    date: '2023-08-05',
-  },
-];
+import { Dialog } from '@headlessui/react';
+import { Plus, FileText, Calendar, Filter, ChevronDown, Search, Trash2, Eye, AlertTriangle } from 'lucide-react';
 
 const Requests: React.FC = () => {
+  const location = useLocation();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [highlightedRequestId, setHighlightedRequestId] = useState<number | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<number | null>(null);
   
-  const filteredRequests = mockRequests.filter((request) => {
+  // Carregar solicitações do local
+  useEffect(() => {
+    const storedRequests = JSON.parse(localStorage.getItem('requests') || '[]');
+    setRequests(storedRequests);
+    
+    // verificar nova solicitação
+    if (location.state?.newRequestId) {
+      setHighlightedRequestId(location.state.newRequestId);
+      
+      // Limpa o state
+      setTimeout(() => {
+        setHighlightedRequestId(null);
+      }, 3000);
+    }
+  }, [location.state]);
+  
+  const filteredRequests = requests.filter((request) => {
     const matchesSearch = 
       request.requestType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.specialty.toLowerCase().includes(searchTerm.toLowerCase());
@@ -70,9 +58,22 @@ const Requests: React.FC = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
   
-  const handleDelete = (id: number) => {
-    // In a real application, this would make an API call
-    console.log(`Delete request ${id}`);
+  // Abre a confirmação e guarda o ID
+  const handleDeleteClick = (id: number) => {
+    setRequestToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+  
+  // Confirma a exclusão e atualiza a lista e o local
+  const handleDeleteConfirm = () => {
+    if (requestToDelete) {
+      const updatedRequests = requests.filter(request => request.id !== requestToDelete);
+      localStorage.setItem('requests', JSON.stringify(updatedRequests));
+      setRequests(updatedRequests);
+      setDeleteConfirmOpen(false);
+      setRequestToDelete(null);
+      setSelectedRequest(null);
+    }
   };
   
   const handleView = (id: number) => {
@@ -95,8 +96,7 @@ const Requests: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
-          {/* Botons */}
+          
           <div className="flex space-x-3 w-full sm:w-auto justify-between sm:justify-start">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -115,7 +115,7 @@ const Requests: React.FC = () => {
             </Link>
           </div>
         </div>
-        
+
         {/* Detalhamento de Filtros */}
         {isFilterOpen && (
           <div className="p-4 bg-gray-50 border-b border-gray-100">
@@ -160,64 +160,127 @@ const Requests: React.FC = () => {
           </div>
         )}
         
-        {selectedRequest && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-              <h3 className="text-lg font-semibold mb-4">Detalhes da Solicitação</h3>
-              {mockRequests.find(r => r.id === selectedRequest) && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Tipo de Solicitação</p>
-                      <p className="text-gray-900">{mockRequests.find(r => r.id === selectedRequest)?.requestType}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Especialidade</p>
-                      <p className="text-gray-900">{mockRequests.find(r => r.id === selectedRequest)?.specialty}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Status</p>
-                      <p className="text-gray-900">
-                        {mockRequests.find(r => r.id === selectedRequest)?.status === 'approved' ? 'Aprovada' : 'Pendente'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Data</p>
-                      <p className="text-gray-900">
-                        {new Date(mockRequests.find(r => r.id === selectedRequest)?.date || '').toLocaleDateString('pt-BR')}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm font-medium text-gray-500">Motivo</p>
-                      <p className="text-gray-900">{mockRequests.find(r => r.id === selectedRequest)?.reason}</p>
-                    </div>
-                  </div>
+        {/* Pop-up de Confirmação */}
+        <Dialog
+          as={motion.div}
+          open={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+          className="relative z-50"
+        >
+          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+
+            <Dialog.Panel className="mx-auto max-w-sm w-full bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle size={24} className="text-red-600" />
                 </div>
-              )}
-              <div className="mt-6 flex justify-end">
+              </div>
+              
+              <Dialog.Title className="text-lg font-medium text-center text-gray-900 mb-2">
+                Confirmar Cancelamento
+              </Dialog.Title>
+              
+              <Dialog.Description className="text-sm text-center text-gray-500 mb-6">
+                Tem certeza que deseja cancelar esta solicitação? Esta ação não pode ser desfeita.
+              </Dialog.Description>
+
+              <div className="flex justify-center space-x-3">
                 <button
-                  onClick={() => setSelectedRequest(null)}
+                  onClick={() => setDeleteConfirmOpen(false)}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                 >
-                  Fechar
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Confirmar
                 </button>
               </div>
-            </div>
+            </Dialog.Panel>
           </div>
+        </Dialog>
+
+        {/* Exibir pop-up de Confirmação */}
+        {selectedRequest && (
+          <Dialog
+            as={motion.div}
+            open={selectedRequest !== null}
+            onClose={() => setSelectedRequest(null)}
+            className="relative z-50"
+          >
+            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+
+              <Dialog.Panel className="mx-auto max-w-2xl w-full bg-white rounded-lg shadow-lg">
+                <div className="px-6 py-4 border-b border-gray-100">
+                  <Dialog.Title className="text-lg font-semibold text-gray-900">
+                    Detalhes da Solicitação
+                  </Dialog.Title>
+                </div>
+
+                {requests.find(r => r.id === selectedRequest) && (
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Tipo de Solicitação</p>
+                        <p className="text-gray-900">{requests.find(r => r.id === selectedRequest)?.requestType}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Especialidade</p>
+                        <p className="text-gray-900">{requests.find(r => r.id === selectedRequest)?.specialty}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Status</p>
+                        <p className="text-gray-900">
+                          {requests.find(r => r.id === selectedRequest)?.status === 'approved' ? 'Aprovada' : 'Pendente'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Data</p>
+                        <p className="text-gray-900">
+                          {new Date(requests.find(r => r.id === selectedRequest)?.date || '').toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-sm font-medium text-gray-500">Motivo</p>
+                        <p className="text-gray-900">{requests.find(r => r.id === selectedRequest)?.reason}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <button
+                        onClick={() => setSelectedRequest(null)}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </Dialog.Panel>
+            </div>
+          </Dialog>
         )}
-        
+
         {/* Lista de solicitações */}
         {filteredRequests.length === 0 ? (
           <div className="p-6 text-center">
             <FileText size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-1">Nenhuma solicitação encontrada</h3>
             <p className="text-gray-500 mb-4">Não existem solicitações que correspondam aos filtros aplicados.</p>
-            <Link to="/requests/new">
-              <Button variant="primary">
+            <div className="flex justify-center items-center h-full">
+              <Link to="/requests/new">
+                <Button variant="primary" className="flex items-center">
                 <Plus size={16} className="mr-1" />
                 Nova Solicitação
-              </Button>
-            </Link>
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <motion.div 
@@ -248,7 +311,11 @@ const Requests: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredRequests.map((request) => (
-                  <motion.tr key={request.id} variants={itemVariants}>
+                  <motion.tr 
+                    key={request.id}
+                    variants={itemVariants}
+                    className={highlightedRequestId === request.id ? 'bg-blue-50' : ''}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{request.requestType}</div>
                     </td>
@@ -278,7 +345,7 @@ const Requests: React.FC = () => {
                         <Eye size={18} />
                       </button>
                       <button 
-                        onClick={() => handleDelete(request.id)}
+                        onClick={() => handleDeleteClick(request.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 size={18} />

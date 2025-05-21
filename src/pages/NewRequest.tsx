@@ -34,6 +34,7 @@ const NewRequest: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RequestFormData>({
     resolver: zodResolver(requestSchema),
   });
@@ -41,10 +42,27 @@ const NewRequest: React.FC = () => {
   const onSubmit = async (data: RequestFormData) => {
     try {
       setIsSubmitting(true);
+
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // cria uma nova solicitação
+      const newRequest = {
+        id: Date.now(),
+        requestType: data.requestType,
+        specialty: data.specialty,
+        reason: data.reason,
+        status: 'pending',
+        date: new Date().toISOString().split('T')[0],
+      };
+      
+      // Store in localStorage
+      const existingRequests = JSON.parse(localStorage.getItem('requests') || '[]');
+      localStorage.setItem('requests', JSON.stringify([...existingRequests, newRequest]));
+      
       setIsSuccess(true);
+
       setTimeout(() => {
-        navigate('/requests');
+        navigate('/requests', { state: { newRequestId: newRequest.id } });
       }, 2000);
     } catch (error) {
       console.error('Error submitting request:', error);
@@ -179,9 +197,9 @@ const NewRequest: React.FC = () => {
                   {...register('requestType')}
                 >
                   <option value="">Selecione o tipo de solicitação</option>
-                  <option value="Acompanhamento em casos Clínicos">Acompanhamento em casos Clínicos</option>
+                  <option value="Acesso ao Sistema">Acesso ao Sistema</option>
                   <option value="Participação em Grupo">Participação em Grupo</option>
-                  <option value="Auxiliar em Procedimento">Auxiliar em Procedimento</option>
+                  <option value="Suporte Técnico">Suporte Técnico</option>
                   <option value="Outros">Outros</option>
                 </select>
                 {errors.requestType && (
