@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import logo from '../assets/logo.png'; 
+import logo from '../assets/logologin.png'; 
 
 type User = {
   id: string;

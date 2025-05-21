@@ -11,6 +11,7 @@ import {
   Menu, 
   X
 } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -48,7 +49,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     <div className="flex justify-between items-center h-16">
       {/* Logo */}
       <div className="flex-shrink-0">
-        <span className="text-blue-600 font-bold text-xl">HC Comunica</span>
+        <Link to="/">
+          <img src={logo} alt="HC Comunica" className="h-10 w-auto" />
+        </Link>
       </div>
       <div className="hidden md:flex flex-1 justify-center space-x-8">
         {menuItems.map((item) => (

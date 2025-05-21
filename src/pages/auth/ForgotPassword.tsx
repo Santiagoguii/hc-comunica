@@ -8,6 +8,8 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
+import logo from '../../assets/logologin.png';
+
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -48,11 +50,11 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-block bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <img src="/hc-comunica-logo.png" alt="HC Comunica" className="h-12" />
+            <div className="inline-block bg-white rounded-2xl shadow-lg p-3 mb-3">
+              <img src={logo} alt="HC Comunica" className="h-36 max-w-xs object-contain" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Recuperar senha</h2>
             <p className="text-gray-600">
