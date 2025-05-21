@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 z-10 relative">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="inline-block bg-white rounded-2xl shadow-lg p-3 mb-3">
@@ -114,10 +114,17 @@ const Login: React.FC = () => {
       </div>
       
       {/* Right side - Background image */}
-      <div className="hidden lg:block lg:w-1/2 bg-cover bg-center" style={{
-        backgroundImage: 'url("https://images.pexels.com/photos/668298/pexels-photo-668298.jpeg?auto=compress&cs=tinysrgb&w=1920")'
-      }} />
-    </div>
+      <div
+    className="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
+    style={{
+      backgroundImage:
+        'url("https://cdn.folhape.com.br/img/pc/450/450/dn_arquivo/2017/01/hospital-das-clinicas-ufpe-arthur-mota.jpg?auto=compress&cs=tinysrgb&w=1920")',
+    }}
+  >
+    {/* Degradê sobre a imagem */}
+    <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-black/70 via-black/20 to-transparent pointer-events-none z-0" />
+  </div>
+</div>
   );
 };
 
