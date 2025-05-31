@@ -2,14 +2,23 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import logo from '../assets/logologin.png'; 
 import { motion } from 'framer-motion';
+import userData from '../data/users.json';
 
 type User = {
   id: string;
   name: string;
   email: string;
   cpf: string;
+
+  academicInfo?: {
+    institution: string;
+    campus: string;
+    department: string;
+    role: string;
+  };
 };
 
+// Define o tipo do contexto de autenticação
 type AuthContextType = {
   user: User | null;
   token: string | null;
@@ -51,28 +60,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
 
-      // Simulando resposta da API
-      const mockResponse = {
-        data: {
-          user: {
-            id: '1',
-            name: 'Test User',
-            email: email,
-            cpf: '123.456.789-00',
-          },
-          token: 'mock-jwt-token',
-        },
-      };
+      const foundUser = userData.users.find(
+        u => u.email === email && u.password === password
+      );
 
-      const { user, token } = mockResponse.data;
+      if (!foundUser) {
+        throw new Error('Invalid credentials');
+      }
 
-      setUser(user);
-      setToken(token);
+      const generatedToken = 'mock-jwt-token'; 
+      localStorage.setItem('token', generatedToken);
+      localStorage.setItem('user', JSON.stringify(foundUser));
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${generatedToken}`;
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+const mockResponse = {
+  data: {
+    user: {
+      id: foundUser.id,
+      name: foundUser.name,
+      email: foundUser.email,
+      cpf: foundUser.cpf,
+    },
+    token: token,
+  },
+};
+
+const { user: userDataResponse, token: responseToken } = mockResponse.data;
+
+setUser(userDataResponse);
+setToken(responseToken);
+
+localStorage.setItem('token', responseToken);
+localStorage.setItem('user', JSON.stringify(userDataResponse));
+
+axios.defaults.headers.common['Authorization'] = `Bearer ${responseToken}`;
+
 
       // Simula carregamento de 5 segundos
       await new Promise(resolve => setTimeout(resolve, 2000));

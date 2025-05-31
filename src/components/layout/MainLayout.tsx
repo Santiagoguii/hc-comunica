@@ -76,7 +76,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           className="flex items-center text-gray-700 hover:text-blue-500 focus:outline-none"
         >
           <User size={20} className="mr-1" />
-          <span className="text-sm font-medium">{user?.name || 'Usuário'}</span>
+          {/* <span className="text-sm font-medium">{user?.name || 'Usuário'}</span> */}
+          <span className="text-sm font-medium">
+           Olá, <span className="font-bold">{user?.name}</span> {/* NOVA PARTE */}
+          </span>
           <LogOut size={16} className="ml-2" />
         </button>
       </div>
