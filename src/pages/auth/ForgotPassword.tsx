@@ -8,7 +8,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
-import logo from '../../assets/logologin.png';
+import logo from '../../assets/logosyneralg.png';
 
 
 const forgotPasswordSchema = z.object({

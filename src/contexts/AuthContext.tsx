@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import logo from '../assets/logologin.png'; 
+import logo from '../assets/logosyneralg.png'; 
 import { motion } from 'framer-motion';
 import userData from '../data/users.json';
 
