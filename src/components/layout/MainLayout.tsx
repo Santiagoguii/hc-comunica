@@ -11,7 +11,7 @@ import {
   Menu, 
   X
 } from 'lucide-react';
-import logo from '../../assets/logosynera2.png';
+import logo from '../../assets/logosynera.png';
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -138,9 +138,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 py-2">
           <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} HC Comunica. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Synera Communication. Todos os direitos reservados.
           </p>
         </div>
       </footer>

@@ -9,13 +9,11 @@ type User = {
   name: string;
   email: string;
   cpf: string;
-
-  academicInfo?: {
-    institution: string;
-    campus: string;
-    department: string;
-    role: string;
-  };
+  institution: string;
+  campus: string;
+  department: string;
+  role: string;
+  position: string;
 };
 
 // Define o tipo do contexto de autenticação
@@ -74,32 +72,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${generatedToken}`;
 
-      
-const mockResponse = {
-  data: {
-    user: {
-      id: foundUser.id,
-      name: foundUser.name,
-      email: foundUser.email,
-      cpf: foundUser.cpf,
-    },
-    token: token,
-  },
-};
-
-const { user: userDataResponse, token: responseToken } = mockResponse.data;
-
-setUser(userDataResponse);
-setToken(responseToken);
-
-localStorage.setItem('token', responseToken);
-localStorage.setItem('user', JSON.stringify(userDataResponse));
-
-axios.defaults.headers.common['Authorization'] = `Bearer ${responseToken}`;
-
-
-      // Simula carregamento de 5 segundos
+      // Simula carregamento de 2 segundos
       await new Promise(resolve => setTimeout(resolve, 2000));
+
+      setUser(foundUser);
+      setToken(generatedToken);
 
     } catch (error) {
       console.error('Login failed:', error);

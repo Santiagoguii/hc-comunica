@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useAuth } from '../contexts/AuthContext';
 import MainLayout from '../components/layout/MainLayout';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -29,22 +30,41 @@ const NewRequest: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
+  const { user } = useAuth();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+    setValue,
   } = useForm<RequestFormData>({
     resolver: zodResolver(requestSchema),
   });
-  
+
+  // Preencher o formulário 
+  useEffect(() => {
+    if (user) {
+      const nameParts = user.name.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+
+      // Set form values
+      setValue('firstName', firstName);
+      setValue('lastName', lastName);
+      setValue('email', user.email);
+      setValue('academicInstitution', user.institution);
+      setValue('campus', user.campus);
+      setValue('specialty', user.department);
+    }
+  }, [user, setValue]);
+
   const onSubmit = async (data: RequestFormData) => {
     try {
       setIsSubmitting(true);
 
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // cria uma nova solicitação
       const newRequest = {
         id: Date.now(),
@@ -53,12 +73,20 @@ const NewRequest: React.FC = () => {
         reason: data.reason,
         status: 'pending',
         date: new Date().toISOString().split('T')[0],
+        //Adicionar info do usuário
+        user: {
+          name: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          phone: data.phone,
+          institution: data.academicInstitution,
+          campus: data.campus
+        }
       };
-      
+
       // Store in localStorage
       const existingRequests = JSON.parse(localStorage.getItem('requests') || '[]');
       localStorage.setItem('requests', JSON.stringify([...existingRequests, newRequest]));
-      
+
       setIsSuccess(true);
 
       setTimeout(() => {
@@ -70,12 +98,12 @@ const NewRequest: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
-  
+
   //Renderiza a tela após concluida
   if (isSuccess) {
     return (
@@ -105,7 +133,7 @@ const NewRequest: React.FC = () => {
       </MainLayout>
     );
   }
-  
+
   return (
     <MainLayout title="Nova Solicitação">
       <motion.div
@@ -131,6 +159,8 @@ const NewRequest: React.FC = () => {
                 placeholder="João"
                 error={errors.firstName?.message}
                 required
+                disabled={!!user}
+                className={user ? "bg-gray-100" : ""}
                 {...register('firstName')}
               />
               
@@ -141,6 +171,8 @@ const NewRequest: React.FC = () => {
                 placeholder="Silva"
                 error={errors.lastName?.message}
                 required
+                disabled={!!user}
+                className={user ? "bg-gray-100" : ""}
                 {...register('lastName')}
               />
               
@@ -152,6 +184,8 @@ const NewRequest: React.FC = () => {
                 placeholder="seu@email.com"
                 error={errors.email?.message}
                 required
+                disabled={!!user}
+                className={user ? "bg-gray-100" : ""}
                 {...register('email')}
               />
               
@@ -172,6 +206,8 @@ const NewRequest: React.FC = () => {
                 placeholder="Universidade Federal"
                 error={errors.academicInstitution?.message}
                 required
+                disabled={!!user}
+                className={user ? "bg-gray-100" : ""}
                 {...register('academicInstitution')}
               />
               
@@ -181,6 +217,8 @@ const NewRequest: React.FC = () => {
                 name="campus"
                 placeholder="Unidade Sul (opcional)"
                 error={errors.campus?.message}
+                disabled={!!user}
+                className={user ? "bg-gray-100" : ""}
                 {...register('campus')}
               />
               
@@ -198,9 +236,14 @@ const NewRequest: React.FC = () => {
                   {...register('requestType')}
                 >
                   <option value="">Selecione o tipo de solicitação</option>
-                  <option value="Acesso ao Sistema">Acesso ao Sistema</option>
-                  <option value="Participação em Grupo">Participação em Grupo</option>
-                  <option value="Suporte Técnico">Suporte Técnico</option>
+                  <option value="Confirmação de Presença na Residência">Confirmação de Presença na Residência</option>
+                  <option value="Acompanhamento Cirúrgico">Acompanhamento Cirúrgico</option>
+                  <option value="Participação em Treinamentos Práticos">Participação em Treinamentos Práticos</option>
+                  <option value="Participação em Treinamentos Teóricos">Participação em Treinamentos Teóricos</option>
+                  <option value="Solicitação de Liberação para Atividades Externas">Solicitação de Liberação para Atividades Externas</option>
+                  <option value="Relatório de Atividades Realizadas">Relatório de Atividades Realizadas</option>
+                  <option value="Declaração de Participação em Atividades">Declaração de Participação em Atividades</option>
+                  <option value="Registro de Atividades de Plantão">Registro de Atividades de Plantão</option>
                   <option value="Outros">Outros</option>
                 </select>
                 {errors.requestType && (

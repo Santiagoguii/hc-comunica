@@ -2,46 +2,15 @@
   "users": [
     {
       "id": "1",
-      "name": "Dr. João Silva",
-      "email": "joao.silva@hc.edu.br",
-      "password": "123456",
-      "cpf": "123.456.789-00",
-      "academicInfo": {
-        "institution": "Hospital das Clínicas - FMUSP",
-        "campus": "Instituto Central",
-        "department": "Cardiologia",
-        "role": "Docente",
-        "position": "Professor Adjunto"
-      }
-    },
-    {
-      "id": "2",
-      "name": "Dra. Maria Santos",
+      "name": "Maria Santos",
       "email": "maria.santos@hc.edu.br",
       "password": "123456",
       "cpf": "987.654.321-00",
-      "academicInfo": {
-        "institution": "Hospital das Clínicas - FMUSP",
-        "campus": "Instituto da Criança",
-        "department": "Pediatria",
-        "role": "Docente",
-        "position": "Professora Associada"
-      }
-    },
-    {
-      "id": "3",
-      "name": "Dr. Pedro Costa",
-      "email": "pedro.costa@hc.edu.br",
-      "password": "123456",
-      "cpf": "456.789.123-00",
-      "academicInfo": {
-        "institution": "Hospital das Clínicas - FMUSP",
-        "campus": "Instituto de Psiquiatria",
-        "department": "Psiquiatria",
-        "role": "Residente",
-        "position": "R3",
-        "supervisor": "Dra. Maria Santos"
-      }
+      "institution": "UFPE",
+      "campus": "Recife",
+      "department": "",
+      "role": "Docente",
+      "position": "Professora Associada"
     }
   ]
 }
