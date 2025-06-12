@@ -82,7 +82,7 @@ const NewRequest: React.FC = () => {
           campus: data.campus
         }
       };
-
+      
       // Store in localStorage
       const existingRequests = JSON.parse(localStorage.getItem('requests') || '[]');
       localStorage.setItem('requests', JSON.stringify([...existingRequests, newRequest]));
